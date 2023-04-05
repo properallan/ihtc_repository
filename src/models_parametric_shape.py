@@ -5,7 +5,7 @@ from bezier import find_control_points, bezier_curve
 
 def hf_model(rootfile, **arg):
     #xr = np.loadtxt(arg['nozzle_shape'], delimiter=',')
-
+    
     xr_cp = np.loadtxt(arg['baselineCP'], delimiter=',')
     xr_cp[2,1] = float(arg['CP3_y'])
 

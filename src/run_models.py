@@ -1,4 +1,5 @@
 import subprocess
+from subprocess import PIPE
 import configparser
 import os
 import shutil
@@ -18,22 +19,32 @@ def doe_run(config_file):
     config = CaseConfigParser()
     config.read(config_file)
 
+    # convert all path to the absolute
+    for each_section in config.sections():
+        for (each_key, each_val) in config.items(each_section):
+            value = pathlib.Path(config[each_section][each_key])
+            if value.is_file() or value.is_dir():
+                config[each_section][each_key] = f"{value.resolve()}"
+            #print(config[each_section][each_key])
+        
     DOEFILE = config['DOE']['DOEFILE']
     
     N = int(config['MULTIRUN']['N'])
-    DOEFILE = config['DOE']['DOEFILE']
-    MULTIPLE_RUNS_PATH = f"./{pathlib.Path(config['MULTIRUN']['MULTIPLE_RUNS_PATH']).absolute().relative_to(os.getcwd())}"
-    MASTER_FILE = pathlib.Path(config['MULTIRUN']['MASTER_FILE']).absolute()
-    DATASET_ROOT = pathlib.Path(config['DATASET']['DATASET_ROOT']).absolute()
+    DOEFILE = pathlib.Path(config['DOE']['DOEFILE']).resolve()
+    MULTIPLE_RUNS_PATH = f"./{pathlib.Path(config['MULTIRUN']['MULTIPLE_RUNS_PATH']).resolve().relative_to(os.getcwd())}"
+    MASTER_FILE = pathlib.Path(config['MULTIRUN']['MASTER_FILE']).resolve()
+    DATASET_ROOT = pathlib.Path(config['DATASET']['DATASET_ROOT']).resolve()
 
-    config['HF_PARAMS']['GMSH_SOLVER'] = str( pathlib.Path(config['HF_PARAMS']['GMSH_SOLVER']).absolute())
-    config['HF_PARAMS']['SU2_SOLVER'] = str( pathlib.Path(config['HF_PARAMS']['SU2_SOLVER']).absolute()) 
-    config['LF_PARAMS']['EULER_Q1D_SOLVER'] = str( pathlib.Path(config['LF_PARAMS']['EULER_Q1D_SOLVER']).absolute() )
+    config['HF_PARAMS']['GMSH_SOLVER'] = str( pathlib.Path(config['HF_PARAMS']['GMSH_SOLVER']).resolve())
+    config['HF_PARAMS']['SU2_SOLVER'] = str( pathlib.Path(config['HF_PARAMS']['SU2_SOLVER']).resolve()) 
+    config['LF_PARAMS']['EULER_Q1D_SOLVER'] = str( pathlib.Path(config['LF_PARAMS']['EULER_Q1D_SOLVER']).resolve() )
+
+
 
     HF_PARAMS = dict(config['HF_PARAMS'])
     LF_PARAMS = dict(config['LF_PARAMS'])
 
-    MODELS_PATH = pathlib.Path(config['MODELS']['models_file']).absolute()
+    MODELS_PATH = pathlib.Path(config['MODELS']['models_file']).resolve()
     models_to_include = f"{MODELS_PATH.stem}"
     models_path_to_include = f"{MODELS_PATH.parents[0]}"
 
@@ -80,20 +91,20 @@ def doe_run(config_file):
                             f"    gen_dataset(hf_model, dataset_root, doe_file,index_range,  hf_params )\n",
                             ])
     
-    subprocess.call(["./multirun.sh", f"{MULTIPLE_RUNS_PATH}"])
+    subprocess.call(["./multirun.sh", f"{MULTIPLE_RUNS_PATH}"], shell=True)#, stdin=PIPE, stderr=PIPE, stdout=PIPE)
 
 def single_run(config_file):
     config = CaseConfigParser()
     config.read(config_file)
 
     if len(config['HF_PARAMS']) > 0:
-        root_file = config['HF_PARAMS']['rootfile']
+        root_file = pathlib.Path(config['HF_PARAMS']['rootfile']).resolve()
         other_params = dict(config['HF_PARAMS'])
         hf_model(**other_params)
 
     try:
         if len(config['HF_PARAMS']) > 0:
-            root_file = config['HF_PARAMS']['rootfile']
+            root_file = pathlib.Path(config['HF_PARAMS']['rootfile']).resolve()
             other_params = dict(config['HF_PARAMS'])
             hf_model(**other_params)
     except:
@@ -101,7 +112,7 @@ def single_run(config_file):
 
     try:
         if len(config['LF_PARAMS']) > 0 :
-            root_file = config['LF_PARAMS']['rootfile']
+            root_file = pathlib.Path(config['LF_PARAMS']['rootfile']).resolve()
             other_params = dict(config['LF_PARAMS'])
             lf_model(**other_params)
     except:
