@@ -1,7 +1,4 @@
 #!/bin/bash 
-
-export DISPLAY=:0.0
-
 declare -i j=0
 declare -i l=3
 for py_file in `find ./multiple_run -maxdepth 1 -name '*.py'`; 
