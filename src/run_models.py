@@ -97,11 +97,6 @@ def single_run(config_file):
     config = CaseConfigParser()
     config.read(config_file)
 
-    if len(config['HF_PARAMS']) > 0:
-        root_file = pathlib.Path(config['HF_PARAMS']['rootfile']).resolve()
-        other_params = dict(config['HF_PARAMS'])
-        hf_model(**other_params)
-
     try:
         if len(config['HF_PARAMS']) > 0:
             root_file = pathlib.Path(config['HF_PARAMS']['rootfile']).resolve()

@@ -1,0 +1,35 @@
+<VTKFile type="vtkMultiBlockDataSet" version="1.0">
+<vtkMultiBlockDataSet>
+<Block name="Zone 0 (Comp. Fluid)">
+<Block name="Internal">
+<DataSet name="Internal" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_0/Internal.vtu"/>
+</Block>
+<Block name="Boundary">
+<DataSet name="UPPER_WALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_0/UPPER_WALL.vtu"/>
+<DataSet name="BOTTOM_WALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_0/BOTTOM_WALL.vtu"/>
+<DataSet name="INFLOW" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_0/INFLOW.vtu"/>
+<DataSet name="OUTFLOW" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_0/OUTFLOW.vtu"/>
+</Block>
+</Block>
+<Block name="Zone 1 (Solid Heat)">
+<Block name="Internal">
+<DataSet name="Internal" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/Internal.vtu"/>
+</Block>
+<Block name="Boundary">
+<DataSet name="INNERWALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/INNERWALL.vtu"/>
+<DataSet name="INNERWALL_2" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/INNERWALL_2.vtu"/>
+<DataSet name="OUTERWALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/OUTERWALL.vtu"/>
+<DataSet name="OUTERWALL_2" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/OUTERWALL_2.vtu"/>
+<DataSet name="INWALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/INWALL.vtu"/>
+<DataSet name="OUTWALL" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/OUTWALL.vtu"/>
+<DataSet name="INWALL_2" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/INWALL_2.vtu"/>
+<DataSet name="OUTWALL_2" file="/home/ppiper/Dropbox/local/ihtc_repository/src//zone_1/OUTWALL_2.vtu"/>
+</Block>
+</Block>
+</vtkMultiBlockDataSet>
+<FieldData>
+<DataArray type='Float32' Name='TimeValue'>
+0
+</DataArray>
+</FieldData>
+</VTKFile>
