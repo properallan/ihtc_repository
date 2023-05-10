@@ -1,0 +1,665 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="version" content="S5 1.1" />
+  <meta name="author" content="Allan Moreira de Carvalho email allan.carvalho@ufabc.edu.br" />
+  <title>Flow Reconstruction with Neural Network-based Reduced Order Modeling</title>
+  <style type="text/css">
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!-- configuration parameters -->
+  <meta name="defaultView" content="slideshow" />
+  <meta name="controlVis" content="hidden" />
+  <!-- style sheet links -->
+  <link rel="stylesheet" href="s5/default/slides.css" type="text/css" media="projection" id="slideProj" />
+  <link rel="stylesheet" href="s5/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+  <link rel="stylesheet" href="s5/default/print.css" type="text/css" media="print" id="slidePrint" />
+  <link rel="stylesheet" href="s5/default/opera.css" type="text/css" media="projection" id="operaFix" />
+  <!-- S5 JS -->
+  <script src="s5/default/slides.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="layout">
+<div id="controls"></div>
+<div id="currentSlide"></div>
+<div id="header"></div>
+<div id="footer">
+  <h1><p>Federal University of ABC - Santo André, Brazil<br />
+2023-04-26</p></h1>
+  <h2>Flow Reconstruction with Neural Network-based Reduced Order
+Modeling</h2>
+</div>
+</div>
+<div class="presentation">
+<div class="title-slide slide">
+  <h1 class="title">Flow Reconstruction with Neural Network-based
+Reduced Order Modeling</h1>
+  <h3 class="author"><p>Allan Moreira de Carvalho<br />
+email <a
+href="mailto:properallan@gmail.com"><code>allan.carvalho@ufabc.edu.br</code></a></p></h3>
+  <h4 class="date"><p>Federal University of ABC - Santo André,
+Brazil<br />
+2023-04-26</p></h4>
+</div>
+<div class="slide section level1">
+
+<p>The performance of rocket engines relies heavily on the flow of gases
+through the nozzle. Therefore, a thorough understanding of flow and heat
+transfer in rocket nozzles is essential for their design and
+optimization. In this paper, we propose a methodology that utilizes
+neural networks and singular value decomposition to reconstruct the
+internal flow and heat transfer fields in a rocket nozzle. The
+methodology involves two main steps. Firstly, we use both low and high
+fidelity computational fluid dynamics (CFD) analyses to simulate the
+flow of gases through the nozzle and predict the heat transfer.
+Secondly, we decompose the data matrix generated from the CFD
+simulations using singular value decomposition (SVD) and train a neural
+network to learn the relationship between the dominant modes obtained
+from the SVD of both fidelity simulations.The trained neural network can
+then be used to reconstruct the flow and heat transfer fields from the
+low fidelity solutions. The proposed methodology has been shown to
+accurately predict fluid flows and, to some extent, temperature and heat
+flux in the nozzle walls. The surrogate model developed using this
+methodology has great potential for improving the design and
+optimization of nozzle flows.</p>
+</div>
+<div id="introduction" class="slide section level1">
+<h1>Introduction</h1>
+<p>In the field of rocket propulsion, accurate prediction of heat
+transfer in nozzle flow plays a critical role in designing and
+optimizing rocket engines <span class="citation">[@Zhang2011]</span>.
+However, existing methods for predicting heat transfer often suffer from
+high computational complexity, making them impractical for engineering
+design purposes. To address this challenge, we propose a flow
+reconstruction <span class="citation">[@Lui2019; @Yu2019]</span>
+technique that combines order reduction using Singular Value
+Decomposition (SVD)<span class="citation">[@Golub2013-ag]</span> with
+neural network modeling <span class="citation">[@Brunton2019-ax]</span>.
+While the individual techniques are not novel, our approach offers a
+combination of these methods for accurate and efficient prediction of
+internal flow and thermal fields in the nozzle, leading to highly
+accurate fluid flow predictions. Furthermore, the use of neural network
+modeling enhances the accuracy of our approach by capturing the complex
+nonlinearities of the flow. Overall, our flow reconstruction technique
+has the potential to significantly improve the design and optimization
+of conjugate heat transfer CFD problems, providing valuable insights
+into the underlying physical phenomena while reducing computational
+complexity.</p>
+</div>
+<div id="methodology" class="slide section level1">
+<h1>Methodology</h1>
+<p>Flow reconstruction <span class="citation">[@Yu2019]</span> is a
+technique used to recover high-fidelity computational fluid dynamics
+(CFD) simulations from low-fidelity ones. This can be accomplished using
+neural networks and singular value decomposition (SVD). The proposed
+methodology is data-driven and consists of three main steps.</p>
+<p>In the first step, the data is generated. To generate a set of high
+fidelity simulations, the input parameters are varied to cover a wide
+range of flow conditions. To generate a set of low fidelity simulations,
+the resolution is reduced, the model is simplified, or a less accurate
+numerical method is used. In the second step, both sets of simulations
+are reduced to a set of basis functions coefficients using SVD, which
+capture the dominant modes of variation in the flow fields. This allows
+for a more efficient representation of the flow field and facilitates
+the use of neural networks for flow reconstruction.</p>
+<p>The final step of the proposed flow reconstruction technique involves
+training a neural network to map the low-fidelity reduced simulations to
+their corresponding high-fidelity counterparts. During the online
+training stage, the neural network takes a set of low-fidelity basis
+coefficients as input and generates a set of coefficients for the
+high-fidelity reduced basis as output. Once trained, the neural network
+can be used for inference in the offline stage. During inference, the
+low-fidelity simulation in full space is projected onto the basis
+coefficients using SVD. These coefficients are then used as input to the
+trained neural network to predict the corresponding high-fidelity basis
+coefficients. Finally, a reverse projection operation is performed on
+the predicted coefficients to recover the high-fidelity simulation in
+full space. Figure provides a schematic representation of this
+reconstruction approach.</p>
+<div class="figure">
+<img src="figures/inference.png" id="fig:flow_chart" alt="" />
+<p class="caption">Flow reconstruction inference flow chart.</p>
+</div>
+<h2 id="step-1-data-generation-using-cfd-analysis">Step 1: Data
+Generation using CFD Analysis</h2>
+<p>In this work, we aim to develop a surrogate model that predicts the
+2D viscous airflow, temperature, and heat flux on the inner surface of a
+nozzle, using only quasi-1D simulations. For the model to be useful for
+design purposes, it must also be sensitive to geometrical parameters.
+Therefore, we focus on two key design variables: the thickness of the
+nozzle wall (<span
+class="math inline"><em>t</em><sub><em>w</em></sub></span>) and the
+shape of the nozzle wall, which is defined by the y-coordinate of a
+Bezier control point (<span
+class="math inline"><em>C</em><em>P</em>3<sub><em>y</em></sub></span>),
+as shown in Figure <a href="#fig:nozzle_shape" reference-type="ref"
+reference="fig:nozzle_shape">2</a>.</p>
+<p>To begin, we use Latin Hypercube sampling (LHS) <span
+class="citation">[@McKay1979]</span> to sample 30 design variables in
+the range provided in Table <a href="#tab:lhs" reference-type="ref"
+reference="tab:lhs">1</a>, as shown in Figure <a href="#fig:lhs"
+reference-type="ref" reference="fig:lhs">3</a>. We consider a set of
+<span class="math inline"><em>N</em></span> pairs of design variables
+denoted as <span
+class="math inline"><em>Ξ</em><sup><em>i</em></sup> = {<em>t</em><sub><em>w</em></sub>,<em>C</em><em>P</em>3<sub><em>y</em></sub>}<sup><em>i</em></sup></span>.
+For each pair, we collect a low-fidelity snapshot (<span
+class="math inline"><strong>L</strong><sup><em>i</em></sup> ∈ ℝ<sup><em>S</em><sub><em>L</em></sub></sup></span>)
+and a high-fidelity snapshot (<span
+class="math inline"><strong>H</strong><sup><em>i</em></sup> ∈ ℝ<sup><em>S</em><sub><em>H</em></sub></sup></span>)
+that contain the modeled variables.</p>
+<p>To store the low-fidelity and high-fidelity snapshots, we use two
+matrices, denoted by <span
+class="math inline"><strong>A</strong><sub><em>L</em></sub></span> and
+<span
+class="math inline"><strong>A</strong><sub><em>H</em></sub></span>,
+respectively. The low-fidelity snapshots are stored in <span
+class="math inline"><strong>A</strong><sub><em>L</em></sub></span>
+according to Equation <a href="#eq:A_L" reference-type="eqref"
+reference="eq:A_L">[eq:A_L]</a>, while the high-fidelity snapshots are
+stored in <span
+class="math inline"><strong>A</strong><sub><em>H</em></sub></span>
+according to Equation <a href="#eq:A_H" reference-type="eqref"
+reference="eq:A_H">[eq:A_H]</a>.</p>
+<p><span
+class="math display"><strong>A</strong><sub><em>L</em></sub> = [<strong>L</strong><sup>1</sup>|…|<strong>L</strong><sup><em>N</em></sup>]<sup><em>S</em><sub><em>L</em></sub> × <em>N</em></sup></span></p>
+<p><span
+class="math display"><strong>A</strong><sub><em>H</em></sub> = [<strong>H</strong><sup>1</sup>|…|<strong>H</strong><sup><em>N</em></sup>]<sup><em>S</em><sub><em>H</em></sub> × <em>N</em></sup></span></p>
+<div class="figure">
+<embed src="figures/nozzle_shape.pdf" id="fig:nozzle_shape" />
+<p class="caption">Nozzle shape defined by the thickness of the wall
+(<span class="math inline"><em>t</em><sub><em>w</em></sub></span>) and
+the y-coordinate of a Bezier control point (<span
+class="math inline"><em>C</em><em>P</em>3<sub><em>y</em></sub></span>).</p>
+</div>
+<div class="figure">
+<embed src="figures/lhs_sampling.pdf" id="fig:lhs" />
+<p class="caption">Latin Hypercube Sampling of 30 design variables
+within the sampling ranges given in Table <a href="#tab:lhs"
+reference-type="ref" reference="tab:lhs">1</a>.</p>
+</div>
+<div id="tab:lhs">
+<table>
+<caption>Sampling ranges for the design variables.</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center"><strong>Minimum</strong></th>
+<th align="center"><strong>Maximum</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span
+class="math inline"><em>t</em><sub><em>w</em></sub></span></td>
+<td align="center">0.0010 m</td>
+<td align="center">0.0100 m</td>
+</tr>
+<tr class="even">
+<td><span
+class="math inline"><em>C</em><em>P</em>3<sub><em>y</em></sub></span></td>
+<td align="center">-0.0125 m</td>
+<td align="center">0.0000 m</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="low-fidelity-model">Low fidelity model</h3>
+<p>The low-fidelity model used in this study is an in-house finite
+volume solver based on the quasi-1D Euler equations <span
+class="citation">[@Hirsch2007-ug]</span>. These equations simplify the
+full problem by neglecting viscous and heat transfer effects but account
+for compressibility effects, which reduces computational costs while
+still capturing the important behavior of transonic and supersonic
+flows. The boundary conditions at the inlet include total pressure
+(<span class="math inline"><em>p</em><sub>0</sub> = 800</span> kPa) and
+total temperature (<span
+class="math inline"><em>T</em><sub>0</sub> = 600</span> K), while the
+outlet boundary condition is static pressure (<span
+class="math inline"><em>p</em><sub><em>b</em></sub> = 101</span> kPa).
+Each <span class="math inline"><em>i</em></span>-th snapshot vector
+<span class="math inline"><strong>L</strong></span>, described in
+Equation <a href="#eq:L_snapshot_matrix" reference-type="eqref"
+reference="eq:L_snapshot_matrix">[eq:L_snapshot_matrix]</a>, is a
+flattened concatenation of the wall thickness (<span
+class="math inline"><em>t</em><sub><em>w</em></sub></span>), control
+point <span
+class="math inline"><em>C</em><em>P</em>3<sub><em>y</em></sub></span>,
+pressure distribution <span
+class="math inline"><strong>p</strong><sub><em>L</em></sub></span>,
+temperature distribution <span
+class="math inline"><strong>T</strong><sub><em>L</em></sub></span>, and
+Mach distribution <span
+class="math inline"><strong>M</strong><sub><em>L</em></sub></span>.
+Since the domain was discretized using 401 cells, each snapshot has a
+dimension of 1025.</p>
+<p><span class="math display">$$\mathbf{L} =
+\begin{bmatrix}
+    t_w \\
+    CP3_y \\
+    \mathbf{p}_L\\
+    \mathbf{T}_L \\
+    \mathbf{M}_L \\
+\end{bmatrix}^{1205 \times 1}
+    \label{eq:L_snapshot_matrix}$$</span></p>
+<h3 id="high-fidelity-model">High fidelity model</h3>
+<p>In contrast, the high-fidelity model is a 2D Navier-Stokes solver
+coupled with conjugate heat transfer to the solid nozzle walls. The
+equations for the fluid domain were solved using the SU2 <span
+class="citation">[@Economon2016]</span> solver with the SST turbulence
+model. Additionally, the energy equation for heat transfer in the wall
+boundary was included. The outside wall temperature was fixed at a
+constant temperature (<span
+class="math inline"><em>T</em><sub><em>w</em></sub> = 300</span>), while
+the inside wall temperature was calculated based on the energy balance
+due to heat transfer from the hot air flow to the AISI406 steel walls.
+In this case, the <span class="math inline"><em>i</em></span>-th
+snapshot takes into account the wall thickness (<span
+class="math inline"><em>t</em><sub><em>w</em></sub></span>), the third
+control point y-coordinate <span
+class="math inline"><em>C</em><em>P</em>3<sub><em>y</em></sub></span>,
+pressure field <span
+class="math inline"><strong>p</strong><sub><em>L</em></sub></span>,
+temperature field <span
+class="math inline"><strong>T</strong><em>L</em></span>, Mach field
+<span class="math inline"><strong>M</strong><em>L</em></span>, solid
+temperature field <span
+class="math inline"><strong>T</strong><strong>s</strong></span>, inside
+wall temperature distribution <span
+class="math inline"><strong>T</strong><strong>i</strong><strong>w</strong></span>,
+and inside wall heat flux distribution <span
+class="math inline"><strong>q</strong></span>. As the 2D solutions are
+much higher dimensional, each snapshot has a 252842 dimension.</p>
+<p><span class="math display">$$\mathbf{L} = \begin{bmatrix}
+    t_w \\
+    CP3_y \\
+    \mathbf{p}_H\\
+    \mathbf{T}_H \\
+    \mathbf{T_s} \\
+    \mathbf{M}_H \\
+\end{bmatrix}^{252842 \times 1 }
+    \label{eq:H_snapshot_matrix}$$</span></p>
+<h2 id="step-2-order-reduction-using-svd">Step 2: Order Reduction using
+SVD</h2>
+<p>The Singular Value Decomposition (SVD) is a matrix factorization
+method, given by Equation <a href="#eq:svd" reference-type="eqref"
+reference="eq:svd">[eq:svd]</a>, that decomposes a matrix <span
+class="math inline"><strong>A</strong></span> into the product of three
+matrices: <span class="math inline"><strong>U</strong></span>, <span
+class="math inline"><strong>Σ</strong></span>, and <span
+class="math inline"><strong>V</strong><sup><em>T</em></sup></span>,
+<span class="citation">[@Press2007; @Golub2013-ag]</span>.</p>
+<p><span
+class="math display"><strong>A</strong> = <strong>U</strong><strong>V</strong><sup><em>T</em></sup></span></p>
+<p>Using SVD, we can approximate <span
+class="math inline"><strong>A</strong></span> by truncating the matrices
+<span class="math inline"><strong>U</strong></span>, <span
+class="math inline"><strong>Σ</strong></span>, and <span
+class="math inline"><strong>V</strong><sup><em>T</em></sup></span> to
+their first <span class="math inline"><em>k</em></span> columns, where
+<span class="math inline"><em>k</em></span> is a positive integer less
+than or equal to the rank <span class="math inline"><em>r</em></span> of
+<span class="math inline"><strong>A</strong></span>. This truncated SVD
+can be written as:</p>
+<p><span class="math display">$$\tilde{\mathbf{A}}
+\approx  \tilde{\mathbf{U}} \tilde{\mathbf{\Lambda}}$$</span></p>
+<p>The cumulative summation provided by Equation <a
+href="#eq:energy_SVD" reference-type="eqref"
+reference="eq:energy_SVD">[eq:energy_SVD]</a> gives the percentage of
+accumulated energy preserved up to the <span
+class="math inline"><em>k</em></span>-th mode of SVD truncation, making
+it useful for assessing the quality of reconstruction using a given
+<span class="math inline"><em>k</em></span> modes. Figure <a
+href="#fig:svd_energy" reference-type="ref"
+reference="fig:svd_energy">4</a> shows this metric for both the
+low-fidelity and high-fidelity datasets after the SVD procedure.</p>
+<p><span class="math display">$$\begin{split}
+\%\; Energy_i= \sum_{j=1}^i \frac{\Sigma_k^2}{\sum_{l=1}^r \Sigma_l^2}
+\times 100 \\ , i = 1,2, \dots, r
+\end{split}
+\label{eq:energy_SVD}$$</span></p>
+<div class="figure">
+<embed src="figures/svd_energy.pdf" id="fig:svd_energy" />
+<p class="caption">Percentual cumulative error of SVD reconstruction as
+a function of number of modes <span
+class="math inline"><em>k</em></span>.</p>
+</div>
+<p>The low fidelity truncated SVD used 5 modes, while the high fidelity
+truncated SVD used 10 modes.</p>
+<h2 id="step-3-training-the-neural-network">Step 3: Training the Neural
+Network</h2>
+<p>The neural network described in this study employs the
+backpropagation algorithm and Mean Squared Error (MSE) as the loss
+function for training. The training data consists of pairs of projected
+matrices of basis coefficients for both low and high fidelity models
+(<span class="math inline">$\tilde{\mathbf{\Lambda_L}}$</span> and <span
+class="math inline">$\tilde{\mathbf{\Lambda_H}}$</span> respectively),
+which are obtained using Equation <a href="#eq:projected_matrices"
+reference-type="eqref"
+reference="eq:projected_matrices">[eq:projected_matrices]</a>. The
+optimizer used is stochastic gradient descent with adaptive moment
+estimation (Adam), and the activation function is hyperbolic tangent.
+The neural network has an input and output layer with neuron counts that
+match the dimensions of each snapshot of basis coefficients.
+Additionally, there are 10 hidden layers, each with 10 neurons. The
+architecture of the neural network is depicted in Figure <a
+href="#fig:nn" reference-type="ref" reference="fig:nn">5</a>.</p>
+<div class="figure">
+<embed src="figures/nn.pdf" id="fig:nn" />
+<p class="caption">Neural Network architecture.</p>
+</div>
+<p><span class="math display">$$\tilde{\mathbf{\Lambda_L}}=
+\tilde{\mathbf{U}}_L \mathbf{A}_L
+    \tilde{\mathbf{\Lambda_H}}= \tilde{\mathbf{U}}_H \mathbf{A}_L
+    \label{eq:projected_matrices}$$</span></p>
+<p>To ensure the robustness and generalization capability of the neural
+network, only <span class="math inline">80</span> % of the available
+snapshots were used for the training process, while the remaining <span
+class="math inline">20</span>% was split into separate validation and
+test datasets. Due to the limited size of the dataset, the model was
+trained for a relatively short period of <span
+class="math inline">300</span> epochs, with a training time of
+approximately 15 seconds.</p>
+</div>
+<div id="results" class="slide section level1">
+<h1>Results</h1>
+<p>The proposed methodology for flow reconstruction of the internal flow
+and heat transfer on a rocket nozzle using neural network and singular
+value decomposition was evaluated by comparing the reconstructed results
+with the CFD simulation results. The performance of the proposed
+methodology was assessed using two metrics: the mean absolute error
+(MAE) and the coefficient of determination (<span
+class="math inline"><em>R</em><sup>2</sup></span>). The MAE measures the
+average magnitude of the errors between the reconstructed and CFD
+simulation results, while <span
+class="math inline"><em>R</em><sup>2</sup></span> measures the
+proportion of the variance in the predictions. The MAE and <span
+class="math inline"><em>R</em><sup>2</sup></span> were calculated for
+both fluid and solid flow fields, and the results are presented in Table
+<a href="#tab:error" reference-type="ref"
+reference="tab:error">2</a>.</p>
+<div id="tab:error">
+<table>
+<caption>Mean absolute error and coefficient of determination for
+surrogate model predictions.</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center"><strong>MAE</strong></th>
+<th align="center"><span
+class="math inline"><strong>R</strong><sup><strong>2</strong></sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline"><strong>p</strong></span></td>
+<td align="center">698.4111 <span
+class="math inline"><em>P</em><em>a</em></span></td>
+<td align="center">0.9999</td>
+</tr>
+<tr class="even">
+<td><span class="math inline"><strong>T</strong></span></td>
+<td align="center">2.7631 <span
+class="math inline"><em>K</em></span></td>
+<td align="center">0.9958</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline"><strong>M</strong></span></td>
+<td align="center">0.0026</td>
+<td align="center">0.9999</td>
+</tr>
+<tr class="even">
+<td><span
+class="math inline"><strong>T</strong><sub>SOLID</sub></span></td>
+<td align="center">8.3579 <span
+class="math inline"><em>K</em></span></td>
+<td align="center">0.7179</td>
+</tr>
+<tr class="odd">
+<td><span
+class="math inline"><strong>T</strong><sub>WALL</sub></span></td>
+<td align="center">16.757 <span
+class="math inline"><em>K</em></span></td>
+<td align="center">0.2241</td>
+</tr>
+<tr class="even">
+<td><span
+class="math inline"><strong>q</strong><sub>WALL</sub></span></td>
+<td align="center">25386.4482 <span
+class="math inline"><em>W</em>/<em>m</em><sup>2</sup></span></td>
+<td align="center">0.8093</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The results demonstrate the high accuracy of the proposed methodology
+in reconstructing the pressure, temperature, and Mach fields, as
+evidenced by the high <span
+class="math inline"><em>R</em><sup>2</sup></span> values and low MAE
+values. The <span class="math inline"><em>R</em><sup>2</sup></span>
+values approach 1, indicating that the reconstructed results account for
+a large portion of the variance in the CFD simulation results.
+Additionally, the relatively small MAE values indicate that the errors
+between the reconstructed results and the CFD simulation results are
+minimal.</p>
+<p>The pressure flow field obtained from the CFD simulation, the
+proposed surrogate model, and their corresponding absolute errors are
+presented in Figures <a href="#fig:cfd_pressure" reference-type="ref"
+reference="fig:cfd_pressure">6</a>, <a href="#fig:prediction_pressure"
+reference-type="ref" reference="fig:prediction_pressure">7</a>, and <a
+href="#fig:error_pressure" reference-type="ref"
+reference="fig:error_pressure">8</a>, respectively. The temperature flow
+field obtained from the CFD simulation, the proposed surrogate model,
+and their corresponding absolute errors are presented in Figures <a
+href="#fig:cfd_temperature" reference-type="ref"
+reference="fig:cfd_temperature">9</a>, <a
+href="#fig:prediction_temperature" reference-type="ref"
+reference="fig:prediction_temperature">10</a>, and <a
+href="#fig:error_temperature" reference-type="ref"
+reference="fig:error_temperature">11</a>, respectively. Finally, the
+Mach flow field obtained from the CFD simulation, the proposed surrogate
+model, and their corresponding absolute errors are presented in Figures
+<a href="#fig:cfd_mach" reference-type="ref"
+reference="fig:cfd_mach">12</a>, <a href="#fig:prediction_mach"
+reference-type="ref" reference="fig:prediction_mach">13</a>, and <a
+href="#fig:error_mach" reference-type="ref"
+reference="fig:error_mach">14</a>, respectively.</p>
+<p>The proposed methodology exhibits significant potential for
+accurately reconstructing fluid flow and heat transfer fields in a
+rocket nozzle. The results indicate that the methodology can accurately
+reconstruct fluid flow fields, particularly the pressure field, as
+demonstrated in Figures <a href="#fig:r2_pressure" reference-type="ref"
+reference="fig:r2_pressure">15</a>,<a href="#fig:r2_temperature"
+reference-type="ref" reference="fig:r2_temperature">16</a> and <a
+href="#fig:r2_mach" reference-type="ref" reference="fig:r2_mach">17</a>.
+However, the surrogate model’s performance was inadequate for variables
+in the solid domain, such as temperature and heat flux, as evident in
+Figure <a href="#fig:r2_heat_flux" reference-type="ref"
+reference="fig:r2_heat_flux">18</a>,<a
+href="#fig:r2_temperature_solid_wall" reference-type="ref"
+reference="fig:r2_temperature_solid_wall">19</a> and <a
+href="#fig:r2_temperature_solid" reference-type="ref"
+reference="fig:r2_temperature_solid">20</a>.</p>
+<p>Combining the neural network approach with singular value
+decomposition results in an efficient and accurate method for
+reconstructing flow and heat transfer fields from low fidelity
+simulations. This methodology is a promising tool for designing and
+optimizing rocket nozzles, where accurate predictions of the flow and
+heat transfer fields are critical for ensuring optimal performance and
+safety.</p>
+<p>Although the model’s performance may be poor in some cases, it still
+has value. This is because the low-fidelity model alone was unable to
+provide a solution for the coupled heat transfer problem, and even
+inaccurate predictions can guide decision-making in a design process, as
+shown in Figures <a href="#fig:wall_heat_flux" reference-type="ref"
+reference="fig:wall_heat_flux">21</a> and <a
+href="#fig:wall_temperature_solid_wall" reference-type="ref"
+reference="fig:wall_temperature_solid_wall">22</a>. While the heat
+transfer and wall temperature are not well predicted, the overall trend
+is captured.</p>
+<div class="figure">
+<img src="figures/Pressure_field_cfd.png" id="fig:cfd_pressure"
+alt="" />
+<p class="caption">CFD pressure [<span
+class="math inline"><em>P</em><em>a</em></span>] flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Pressure_field_reconstructed.png"
+id="fig:prediction_pressure" alt="" />
+<p class="caption">Surrogate model prediction of pressure [<span
+class="math inline"><em>P</em><em>a</em></span>] flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Pressure_field_error.png" id="fig:error_pressure"
+alt="" />
+<p class="caption">Absolute error of surrogate model predition of
+pressure [<span class="math inline"><em>P</em><em>a</em></span>] flow
+field.</p>
+</div>
+<div class="figure">
+<img src="figures/Temperature_field_cfd.png" id="fig:cfd_temperature"
+alt="" />
+<p class="caption">CFD temperature [<span
+class="math inline"><em>K</em></span>] flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Pressure_field_reconstructed.png"
+id="fig:prediction_temperature" alt="" />
+<p class="caption">Surrogate model prediction of temperature [<span
+class="math inline"><em>K</em></span>] flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Temperature_field_error.png"
+id="fig:error_temperature" alt="" />
+<p class="caption">Absolute error of surrogate model predition of
+temperature [<span class="math inline"><em>K</em></span>] flow
+field.</p>
+</div>
+<div class="figure">
+<img src="figures/Mach_field_cfd.png" id="fig:cfd_mach" alt="" />
+<p class="caption">CFD Mach flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Mach_field_reconstructed.png" id="fig:prediction_mach"
+alt="" />
+<p class="caption">Surrogate model prediction of Mach flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/Mach_field_error.png" id="fig:error_mach" alt="" />
+<p class="caption">Absolute error of surrogate model predition of Mach
+flow field.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Pressure.png" id="fig:r2_pressure" alt="" />
+<p class="caption">Surrogate model prediction of pressure [<span
+class="math inline"><em>P</em><em>a</em></span>] flow fields over test
+dataset.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Temperature.png" id="fig:r2_temperature"
+alt="" />
+<p class="caption">Surrogate model prediction of temperature [<span
+class="math inline"><em>K</em></span>] flow fields over test
+dataset.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Mach.png" id="fig:r2_mach" alt="" />
+<p class="caption">Surrogate model prediction of Mach flow fields over
+test dataset.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Heat_Flux_UPPER_WALL.png"
+id="fig:r2_heat_flux" alt="" />
+<p class="caption">Surrogate model prediction of heat flux [<span
+class="math inline"><em>W</em>/<em>m</em><sup>2</sup></span>]
+distributions over test dataset.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Temperature_Solid_INNERWALL.png"
+id="fig:r2_temperature_solid_wall" alt="" />
+<p class="caption">Surrogate model prediction of nozzle wall surface
+temperature [<span class="math inline"><em>K</em></span>] distributions
+over test dataset.</p>
+</div>
+<div class="figure">
+<img src="figures/results/Temperature_Solid.png"
+id="fig:r2_temperature_solid" alt="" />
+<p class="caption">Surrogate model prediction of nozze wall temperature
+[<span class="math inline"><em>K</em></span>] field over test
+dataset.</p>
+</div>
+<div class="figure">
+<embed src="figures/predicted_wall_heat_flux.pdf"
+id="fig:wall_heat_flux" />
+<p class="caption">Surrogate model prediction of a heat flux [<span
+class="math inline"><em>W</em>/<em>m</em><sup>2</sup></span>]
+distribution.</p>
+</div>
+<div class="figure">
+<embed src="figures/predicted_wall_temperature.pdf"
+id="fig:wall_temperature_solid_wall" />
+<p class="caption">Surrogate model prediction of a nozzle wall surface
+temperature [<span class="math inline"><em>K</em></span>]
+distribution.</p>
+</div>
+<p>Despite the inaccuracies in the solid field solutions, it is
+important to emphasize the significant speedup achieved by the surrogate
+model. While high-fidelity CFD took about 1 hour and 30 minutes to
+complete, the surrogate model can predict a flow field within just 10.6
+seconds (an astonishing 500-fold speedup). It’s important to note that
+this time includes the time needed to generate the mesh for a new
+geometry, as during data projection into the latent space, all spatial
+information is lost.</p>
+<h2 id="model-limitations-and-improvements-suggestions">Model
+Limitations and Improvements Suggestions</h2>
+<p>However, one major drawback of the model is the need for a large
+amount of data for training. Since the dataset used for training is
+quite small, adding more snapshots is expected to improve model
+accuracy. Additionally, using more elaborate individual normalization
+techniques for each variable could help the model. Another suggestion is
+to perform hyperparameter optimization on the number of layers and
+neurons, activation functions, and try more advanced loss functions and
+optimization algorithms. Moreover, redesigning the variables selected to
+compose the dataset could also help improve the model. Replacing single
+scalar values of wall thickness and the y-coordinate of the control
+point with a distribution of wall thickness and the distribution of
+y-coordinates for the nozzle wall could help the model to predict
+variability associated with the wall contour change.</p>
+</div>
+<div id="conclusion-and-future-work" class="slide section level1">
+<h1>Conclusion and Future Work</h1>
+<p>In conclusion, although our methodology did not introduce any novel
+techniques, it proved to be effective in accurately reconstructing the
+fluid flow in a rocket nozzle using neural network and singular value
+decomposition. However, we acknowledged that the methodology’s
+performance was limited in reconstructing the heat flux and wall
+temperature fields. We provided suggestions for improving the
+methodology and suggested increasing the sample size in the dataset and
+comparing our model with other surrogate models as future work. Despite
+these limitations, the proposed methodology has the potential to enhance
+the design and optimization cycle by offering a more precise
+understanding of flow and heat transfer while reducing computational
+cost.</p>
+</div>
+<div id="code-repository" class="slide section level1">
+<h1>Code Repository</h1>
+<p>The code utilized and developed for this project can be found in its
+entirety on the corresponding GitHub repository <span
+class="citation">[@Carvalho_A_Flow_Reconstruction_2023]</span>.</p>
+</div>
+</div>
+</body>
+</html>

@@ -555,6 +555,7 @@ class nozzle:
     def solveSU2CHT(self, solver, cores=None, cwd=None):
         oldcfg = self.su2cfgfile
         self.su2cfgfile = self.su2infilepath + 'cht_setupSU2.cfg'
+        
         self.solveSU2(solver, cores, cwd)
         self.su2cfgfile = oldcfg
 
@@ -567,6 +568,7 @@ class nozzle:
         if cwd is None: 
             cwd = os.path.dirname(os.path.realpath(__file__)) 
 
+        cur_dir = os.getcwd()
         if cores is not None: 
             os.chdir(pathlib.Path(self.su2outfilepath))
             p = subprocess.Popen(['mpirun', '-n', f'{cores}', solver, self.su2cfgfile], cwd=f'{cwd}') 
@@ -575,18 +577,15 @@ class nozzle:
             p = subprocess.Popen([solver, self.su2cfgfile], cwd=f'{cwd}')
 
         p.wait()
+
         # move results to output file
         try:
             file_no_ext = pathlib.Path(self.su2cfgfile).stem
             shutil.move(f"{self.su2infilepath}/{file_no_ext}.vtm", f"{self.su2outfilepath}/{file_no_ext}.vtm")
             shutil.move(f"{self.su2infilepath}/{file_no_ext}.csv", f"{self.su2outfilepath}/{file_no_ext}.csv")
-            """
-            shutil.move(f"{cwd}/restart_0.csv", self.su2outfilepath +  "restart_fluid.csv")
-            shutil.move(f"{cwd}/restart_1.csv", self.su2outfilepath +  "restart_solid.csv")
-            shutil.move(f"{cwd}/fluid_0.vtk", self.su2outfilepath +  "fluid.vtk")
-            shutil.move(f"{cwd}/solid_1.vtk", self.su2outfilepath +  "solid.vtk")
-            """
-            
+
+            self.solution_file = pathlib.Path(f"{self.su2outfilepath}/{file_no_ext}.vtm")
+
             saveVtkMesh(self.su2outfilepath +  "fluid.vtk")
             saveVtkMesh(self.su2outfilepath +  "solid.vtk")
             self.su2_converged = True
@@ -596,6 +595,9 @@ class nozzle:
 
         self.runtimeSU2 = timeit.default_timer() - self.runtimeSU2
         print('runtime: ' + str(self.runtimeSU2) + 's')
+
+        os.chdir(cur_dir)
+
         
     def getMesh(self, meshfile):
         mesh = meshio.read(self.su2infilepath + meshfile)
@@ -929,7 +931,8 @@ MESH_FORMAT= SU2
 % Output file format (TECPLOT, TECPLOT_BINARY, PARAVIEW, PARAVIEW_BINARY,
 %                     FIELDVIEW, FIELDVIEW_BINARY)
 OUTPUT_FILES = ()
-OUTPUT_WRT_FREQ= {self.itmaxSU2}
+OUTPUT_WRT_FREQ= 1
+% {self.itmaxSU2}
 %TABULAR_FORMAT= CSV
 %
 % Output file convergence history (w/o extension)
@@ -951,10 +954,10 @@ SURFACE_FILENAME= fluid_surface
         
         
     def setupSU2CHT(self, su2filepath, su2filename):
-        self.su2infilepath = su2filepath
+        su2filepath = os.path.abspath(su2filepath)
         self.su2filename = su2filename
-        self.su2infilepath = su2filepath + 'inputs/'
-        self.su2outfilepath = su2filepath + 'outputs/'
+        self.su2infilepath = su2filepath + '/inputs/'
+        self.su2outfilepath = su2filepath + '/outputs/'
         self.su2cfgfile = os.path.abspath(self.su2infilepath + su2filename)        
         self.su2cfgfile_solid = os.path.abspath(self.su2infilepath + f"solid_{su2filename}")
         self.su2cfgfile_cht = os.path.abspath(self.su2infilepath + f"cht_{su2filename}")
@@ -1596,7 +1599,8 @@ HISTORY_OUTPUT=OUTER_ITER,RMS_DENSITY[0], RMS_ENERGY[0], RMS_MOMENTUM-X[0], RMS_
 SCREEN_OUTPUT=OUTER_ITER,RMS_DENSITY[0], RMS_ENERGY[0], RMS_MOMENTUM-X[0], RMS_MOMENTUM-Y[0], RMS_MOMENTUM-Z[0], RMS_TKE[0], RMS_DISSIPATION[0], RMS_TEMPERATURE[1]
 
 % Writing solution file frequency
-OUTPUT_WRT_FREQ= {self.itmaxSU2}
+OUTPUT_WRT_FREQ= 1 
+%{self.itmaxSU2}
 
 % Writing frequency for screen output
 SCREEN_WRT_FREQ_OUTER= {self.itprintSU2}
