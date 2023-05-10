@@ -6,6 +6,8 @@ import shutil
 import sys
 import numpy as np
 import pathlib
+from ast import literal_eval
+from doe_sampling import write_lhs_file
 
 class CaseConfigParser(configparser.ConfigParser):
     def optionxform(self, optionstr):
@@ -15,7 +17,7 @@ def read_doe(doefile):
     doe = np.loadtxt(doefile, delimiter=',', skiprows=1)
     return doe
 
-def doe_run(config_file):
+def read_config_file(config_file):
     config = CaseConfigParser()
     config.read(config_file)
 
@@ -25,12 +27,25 @@ def doe_run(config_file):
             value = pathlib.Path(config[each_section][each_key])
             if value.is_file() or value.is_dir():
                 config[each_section][each_key] = f"{value.resolve()}"
-            #print(config[each_section][each_key])
-        
-    DOEFILE = config['DOE']['DOEFILE']
+    return config
+
+def doe_run(config_file):
+    config = read_config_file(config_file)
+
+    SAMPLES = int(config['DATASET']['SAMPLES'])
+    DATASET_ROOT = pathlib.Path(config['DATASET']['DATASET_ROOT']).resolve()
+    DOEFILE = DATASET_ROOT /  pathlib.Path(config['DATASET']['DOEFILE'])
+
+    DOE_VARIABLES = dict(config['DOE_VARIABLES'])
+
+    for key, val in DOE_VARIABLES.items():
+        DOE_VARIABLES[key] = literal_eval(val)
+        print(key, DOE_VARIABLES[key])
+
+    write_lhs_file(DOE_VARIABLES, SAMPLES, DOEFILE)
     
     N = int(config['MULTIRUN']['N'])
-    DOEFILE = pathlib.Path(config['DOE']['DOEFILE']).resolve()
+    #DOEFILE = pathlib.Path(config['DOE']['DOEFILE']).resolve()
     MULTIPLE_RUNS_PATH = f"./{pathlib.Path(config['MULTIRUN']['MULTIPLE_RUNS_PATH']).resolve().relative_to(os.getcwd())}"
     MASTER_FILE = pathlib.Path(config['MULTIRUN']['MASTER_FILE']).resolve()
     DATASET_ROOT = pathlib.Path(config['DATASET']['DATASET_ROOT']).resolve()
@@ -40,9 +55,10 @@ def doe_run(config_file):
     config['LF_PARAMS']['EULER_Q1D_SOLVER'] = str( pathlib.Path(config['LF_PARAMS']['EULER_Q1D_SOLVER']).resolve() )
 
 
-
     HF_PARAMS = dict(config['HF_PARAMS'])
     LF_PARAMS = dict(config['LF_PARAMS'])
+
+    HF_PARAMS['only_generate_mesh'] = False
 
     MODELS_PATH = pathlib.Path(config['MODELS']['models_file']).resolve()
     models_to_include = f"{MODELS_PATH.stem}"

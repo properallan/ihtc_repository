@@ -40,8 +40,8 @@ def write_lhs_file(doe_variables, samples, path):
     print(path)
 
 # %%
-SAMPLES = 30
-DATASET_ROOT = f'../data/doe_30/'
+SAMPLES = 60
+DATASET_ROOT = f'../data/doe_{}/'
 DOEFILE = f'{DATASET_ROOT}doe_lhs.txt'
 
 DOE_VARIABLES = {
