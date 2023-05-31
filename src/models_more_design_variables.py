@@ -101,7 +101,7 @@ def hf_model(rootfile, **arg ):
     n.laminarPrandtl = laminar_prandtl[fluid]
     n.turbulentPrandtl = turbulent_prandtl[fluid]
 
-    n.outerTemperature = 300.0 
+    n.outerTemperature = float(arg['outerTemperature'])
     n.thickness = float(arg['Thickness'])
 
     # n.outerTemperature = 300.0
